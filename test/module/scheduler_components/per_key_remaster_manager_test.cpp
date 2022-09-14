@@ -15,7 +15,8 @@ class PerKeyRemasterManagerTest : public ::testing::Test {
  protected:
   void SetUp() {
     configs = MakeTestConfigurations("locking", 2, 1);
-    storage = make_shared<slog::MemOnlyStorage>();
+    // storage = make_shared<slog::MemOnlyStorage>();
+    storage = make_shared<slog::MySQLStorage>();
     remaster_manager = make_unique<PerKeyRemasterManager>(storage);
   }
 

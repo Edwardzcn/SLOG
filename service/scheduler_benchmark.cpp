@@ -6,7 +6,8 @@
 #include "connection/broker.h"
 #include "module/scheduler.h"
 #include "service/service_utils.h"
-#include "storage/mem_only_storage.h"
+// #include "storage/mem_only_storage.h"
+#include "storage/mysql_storage.h"
 #include "workload/basic.h"
 
 DEFINE_uint32(txns, 100, "Number of transactions");
@@ -56,7 +57,9 @@ int main(int argc, char* argv[]) {
   }
 
   auto config = make_shared<Configuration>(config_proto, address);
-  auto storage = make_shared<slog::MemOnlyStorage>();
+  // auto storage = make_shared<slog::MemOnlyStorage>();
+  // !!TODO: Fixme: error: cannot convert ‘mysqlx::abi2::r0::string’ to ‘char16_t’ in assignment
+  auto storage = make_shared<slog::MySQLStorage>();
 
   // Prepare the modules
   auto broker = Broker::New(config);

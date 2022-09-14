@@ -4,4 +4,5 @@ target_sources(slog-core
     batch_log.cpp
     batch_log.h
     concurrent_hash_map.h
+    mysql_database.h
     rwlatch.h)

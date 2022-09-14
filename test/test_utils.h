@@ -13,7 +13,8 @@
 #include "module/base/module.h"
 #include "module/scheduler_components/txn_holder.h"
 #include "proto/internal.pb.h"
-#include "storage/mem_only_storage.h"
+// #include "storage/mem_only_storage.h"
+#include "storage/mysql_storage.h"
 #include "storage/metadata_initializer.h"
 
 using std::pair;
@@ -75,7 +76,8 @@ class TestSlog {
  private:
   ConfigurationPtr config_;
   SharderPtr sharder_;
-  shared_ptr<MemOnlyStorage> storage_;
+  // shared_ptr<MemOnlyStorage> storage_;
+  shared_ptr<MySQLStorage> storage_;
   shared_ptr<MetadataInitializer> metadata_initializer_;
   shared_ptr<Broker> broker_;
   ModuleRunnerPtr server_;

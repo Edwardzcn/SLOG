@@ -13,7 +13,8 @@ class SimpleRemasterManagerTest : public ::testing::Test {
  protected:
   void SetUp() {
     configs = MakeTestConfigurations("remaster", 2, 1);
-    storage = make_shared<slog::MemOnlyStorage>();
+    // storage = make_shared<slog::MemOnlyStorage>();
+    storage = make_shared<slog::MySQLStorage>();
     remaster_manager = make_unique<SimpleRemasterManager>(storage);
   }
 

@@ -4,4 +4,5 @@ target_sources(slog-core
     mem_only_storage.h
     metadata_initializer.h
     metadata_initializer.cpp
+    mysql_storage.h
     storage.h)

@@ -20,7 +20,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 #========================================
 
 option(BUILD_SLOG_CLIENT           "Build the client"                      ON)
-option(BUILD_SLOG_TESTS            "Build the tests"                       ON)
+option(BUILD_SLOG_TESTS            "Build the tests"                       OFF)
 option(ENABLE_TXN_EVENT_RECORDING  "Enable transaction events recording"   ON)
 option(FETCH_DEPENDENCIES          "Automatically fetch the dependencies"  OFF)
 set(REMASTER_PROTOCOL "COUNTERLESS" CACHE STRING "Protocol for remastering (\"SIMPLE\", \"PER_KEY\", \"COUNTERLESS\", \"NONE\")")
@@ -231,13 +231,17 @@ add_library(slog-core STATIC "")
 foreach (DIR ${SLOG_CORE_SRC_DIRS})
   add_subdirectory(${DIR})
 endforeach()
-target_include_directories(slog-core PUBLIC ${CMAKE_SOURCE_DIR})
+target_include_directories(slog-core
+  PUBLIC
+    ${CMAKE_SOURCE_DIR}
+)
 target_link_libraries(slog-core
   PUBLIC
     proto
     glog::glog
     cppzmq-static
-    rapidjson)
+    rapidjson
+)
 
 set(ENABLE_REMASTER TRUE)
 string(TOUPPER ${REMASTER_PROTOCOL} REMASTER_PROTOCOL_)
@@ -286,30 +290,57 @@ endif()
 #========================================
 
 # Create an executable for each service
+set(MYSQL_CONCPP_DIR "/usr")
+link_libraries(mysqlcppconn8)
+
 add_executable(slog service/slog.cpp service/service_utils.h)
-target_link_libraries(slog PRIVATE slog-core gflags::gflags)
+target_include_directories(slog
+  PUBLIC
+    "${MYSQL_CONCPP_DIR}/include/mysql-cppconn-8/"
+)
+target_link_libraries(slog 
+  PUBLIC 
+    slog-core 
+    gflags::gflags
+    mysqlcppconn8
+)
 
 if (BUILD_SLOG_CLIENT)
   add_executable(client service/client.cpp service/service_utils.h)
+  target_include_directories(client
+    PUBLIC
+      "${MYSQL_CONCPP_DIR}/include/mysql-cppconn-8/"
+  )
   target_link_libraries(client
-    PRIVATE
+    PUBLIC
       slog-core
       gflags::gflags
+      mysqlcppconn8
   )
 endif()
 
 add_executable(benchmark service/benchmark.cpp service/service_utils.h)
+target_include_directories(benchmark
+  PUBLIC
+    "${MYSQL_CONCPP_DIR}/include/mysql-cppconn-8/"
+)
 target_link_libraries(benchmark
-  PRIVATE
+  PUBLIC
     slog-core
     gflags::gflags
+    mysqlcppconn8
 )
 
 add_executable(scheduler_benchmark service/scheduler_benchmark.cpp)
+target_include_directories(scheduler_benchmark
+  PUBLIC
+    "${MYSQL_CONCPP_DIR}/include/mysql-cppconn-8/"
+)
 target_link_libraries(scheduler_benchmark
-  PRIVATE
+  PUBLIC
     slog-core
     gflags::gflags
+    mysqlcppconn8
 )
 
 #========================================

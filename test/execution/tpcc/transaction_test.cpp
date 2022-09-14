@@ -9,7 +9,8 @@
 #include "execution/tpcc/metadata_initializer.h"
 #include "execution/tpcc/table.h"
 #include "execution/tpcc/transaction.h"
-#include "storage/mem_only_storage.h"
+// #include "storage/mem_only_storage.h"
+#include "storage/mysql_storage.h"
 
 using namespace std;
 using namespace slog;
@@ -18,7 +19,8 @@ using namespace slog::tpcc;
 class TransactionTest : public ::testing::Test {
  protected:
   void SetUp() {
-    storage = std::make_shared<MemOnlyStorage>();
+    // storage = std::make_shared<MemOnlyStorage>();
+    storage = std::make_shared<MySQLStorage>();
     auto metadata_initializer = std::make_shared<TPCCMetadataInitializer>(2, 1);
     kv_storage_adapter = std::make_shared<KVStorageAdapter>(storage, metadata_initializer);
     LoadTables(kv_storage_adapter, W, 1, 0, 1);

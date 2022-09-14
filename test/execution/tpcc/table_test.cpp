@@ -6,7 +6,8 @@
 
 #include "common/proto_utils.h"
 #include "execution/tpcc/metadata_initializer.h"
-#include "storage/mem_only_storage.h"
+// #include "storage/mem_only_storage.h"
+#include "storage/mysql_storage.h"
 
 using namespace std;
 using namespace slog;
@@ -98,7 +99,8 @@ class UngroupedTableTest : public TableTest {
              MakeInt32Scalar(6476)}};
     // clang-format on
 
-    storage = std::make_shared<MemOnlyStorage>();
+    // storage = std::make_shared<MemOnlyStorage>();
+    storage = std::make_shared<MySQLStorage>();
     auto metadata_initializer = std::make_shared<TPCCMetadataInitializer>(2, 1);
     auto storage_adapter = std::make_shared<KVStorageAdapter>(storage, metadata_initializer);
     Table<DistrictSchema> storage_table(storage_adapter);
@@ -193,7 +195,8 @@ class GroupedTableTest : public TableTest {
              MakeFixedTextScalar<50>("something something something something something2")}};
     // clang-format on
 
-    storage = std::make_shared<MemOnlyStorage>();
+    // storage = std::make_shared<MemOnlyStorage>();
+    storage = std::make_shared<MySQLStorage>();
     auto metadata_initializer = std::make_shared<TPCCMetadataInitializer>(2, 1);
     auto storage_adapter = std::make_shared<KVStorageAdapter>(storage, metadata_initializer);
     Table<ItemSchema> storage_table(storage_adapter);
