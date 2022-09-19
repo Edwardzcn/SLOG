@@ -5,6 +5,7 @@
 
 #include "common/configuration.h"
 #include "common/constants.h"
+#include "common/debug.h"
 #include "common/metrics.h"
 #include "common/offline_data_reader.h"
 #include "common/sharder.h"
@@ -22,9 +23,12 @@
 #include "proto/internal.pb.h"
 #include "proto/offline_data.pb.h"
 #include "service/service_utils.h"
-#include "storage/mem_only_storage.h"
-// #include "storage/metadata_initializer.h"
+#ifdef MYSQL_DEBUG
 #include "storage/mysql_storage.h"
+#else
+#include "storage/mem_only_storage.h"
+#include "storage/metadata_initializer.h"
+#endif
 #include "version.h"
 
 DEFINE_string(config, "slog.conf", "Path to the configuration file");
@@ -174,9 +178,11 @@ int main(int argc, char* argv[]) {
   auto broker = Broker::New(config);
 
   // Create and initialize storage layer
-  // auto storage = make_shared<slog::MemOnlyStorage>();
-  // !!TODO: Fixme: error: cannot convert ‘mysqlx::abi2::r0::string’ to ‘char16_t’ in assignment
+#ifdef MYSQL_DEBUG
   auto storage = make_shared<slog::MySQLStorage>();
+#else
+  auto storage = make_shared<slog::MemOnlyStorage>();
+#endif
   std::shared_ptr<slog::MetadataInitializer> metadata_initializer;
   switch (config->proto_config().partitioning_case()) {
     case slog::internal::Configuration::kSimplePartitioning:

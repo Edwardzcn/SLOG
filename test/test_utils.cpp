@@ -5,6 +5,7 @@
 #include <random>
 #include <set>
 
+#include "common/debug.h"
 #include "common/proto_utils.h"
 #include "connection/zmq_utils.h"
 #include "module/consensus.h"
@@ -121,8 +122,11 @@ ValueEntry TxnValueEntry(const Transaction& txn, const std::string& key) {
 TestSlog::TestSlog(const ConfigurationPtr& config)
     : config_(config),
       sharder_(Sharder::MakeSharder(config)),
-      // storage_(new MemOnlyStorage()),
+#ifdef MYSQL_DEBUG
       storage_(new MySQLStorage()),
+#else
+      storage_(new MemOnlyStorage()),
+#endif
       broker_(Broker::New(config, kTestModuleTimeout)),
       client_context_(1) {
   client_context_.set(zmq::ctxopt::blocky, false);

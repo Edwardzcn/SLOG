@@ -20,7 +20,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 #========================================
 
 option(BUILD_SLOG_CLIENT           "Build the client"                      ON)
-option(BUILD_SLOG_TESTS            "Build the tests"                       OFF)
+option(BUILD_SLOG_TESTS            "Build the tests"                       ON)
 option(ENABLE_TXN_EVENT_RECORDING  "Enable transaction events recording"   ON)
 option(FETCH_DEPENDENCIES          "Automatically fetch the dependencies"  OFF)
 set(REMASTER_PROTOCOL "COUNTERLESS" CACHE STRING "Protocol for remastering (\"SIMPLE\", \"PER_KEY\", \"COUNTERLESS\", \"NONE\")")

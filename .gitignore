@@ -40,6 +40,12 @@ build/
 .deps/
 .dep/
 
+# Data
+data/
+
+# mysql test
+mysql_test/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

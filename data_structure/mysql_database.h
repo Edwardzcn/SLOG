@@ -7,27 +7,6 @@ using namespace std;
 
 namespace slog {
 
-// template <typename KeyType, typename ValueType>
-// class MySQLClient
-// {
-// private:
-//     /* data */
-//     Session sess;
-//     Schema db;
-
-// public:
-//     MySQLClient(/* args */);
-//     ~MySQLClient();
-// };
-
-// MySQLClient::MySQLClient(/* args */)
-// {
-// }
-
-// MySQLClient::~MySQLClient()
-// {
-// }
-
 template <typename KeyType, typename ValueType, typename HashFn = std::hash<KeyType>, uint8_t ShardBits = 8>
 // don't know why need to add typename HashFn and uint8_t ShardBits = 8
 class MySQLDatabase {
@@ -45,14 +24,13 @@ class MySQLDatabase {
  public:
   MySQLDatabase() {
     // create MySQL connection by default
-    mysql_host = "localhost";
+    mysql_host = "127.0.0.1";
     mysql_port = 3750;
-    mysql_user = "root";
+    mysql_user = "edwardzcn";
     mysql_pwd = "ustc1234";
     mysql_sock = "/home/edwardzcn/test/mysql/data/m1/mysql.sock";
     cout << "Creating mysql session on " << mysql_host << ":" << mysql_port << endl;
-    // mysql_sess = new mysqlx::Session("localhost",3750,"edwardzcn","ustc1234");
-    mysqlx::SessionSettings option(mysql_host, mysql_port, mysql_user, mysql_pwd);
+    mysqlx::SessionSettings option(mysql_host, mysql_port, mysql_user);
     mysql_sess = new mysqlx::Session(option);
     // !TODO: remove me (for session test)
     cout << "Session accepted, creating coolection from db 'test1'." << endl;
@@ -60,7 +38,12 @@ class MySQLDatabase {
     mysqlx::Schema mysql_sch = mysql_sess->getSchema("test1");
     // !TODO: remove me (for session db test)
     auto table_names = mysql_sch.getTableNames();
-    cout << "Tables in db 'test1' are: " << table_names;
+    cout << "Tables in db 'test1' are: ";
+    for (auto table_name : table_names){
+      cout << table_name;
+    }
+    cout << endl;
+    
 
     mysql_sess->sql("use test1");
   }

@@ -13,7 +13,15 @@ if(NOT googletest_POPULATED)
 endif()
 
 add_library(test-utils test_utils.cpp)
-target_link_libraries(test-utils PUBLIC slog-core)
+target_include_directories(test-utils
+  PUBLIC
+    "${MYSQL_CONCPP_DIR}/include/mysql-cppconn-8/"
+)
+target_link_libraries(test-utils
+  PUBLIC 
+    slog-core
+    mysqlcppconn8
+)
 
 macro(add_slog_test TESTFILE)
   get_filename_component(TESTNAME ${TESTFILE} NAME_WE)

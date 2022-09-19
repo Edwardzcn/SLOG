@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 
+#include "common/debug.h"
 #include "common/configuration.h"
 #include "common/constants.h"
 #include "common/proto_utils.h"
@@ -11,7 +12,11 @@
 #include "module/forwarder.h"
 #include "module/server.h"
 #include "proto/api.pb.h"
+#ifdef MYSQL_DEBUG
+#include "storage/mysql_storage.h"
+#else
 #include "storage/mem_only_storage.h"
+#endif
 #include "test/test_utils.h"
 
 using namespace std;

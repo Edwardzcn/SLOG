@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "common/debug.h"
 #include "common/configuration.h"
 #include "connection/broker.h"
 #include "connection/sender.h"
@@ -13,8 +14,11 @@
 #include "module/base/module.h"
 #include "module/scheduler_components/txn_holder.h"
 #include "proto/internal.pb.h"
-// #include "storage/mem_only_storage.h"
+#ifdef MYSQL_DEBUG
 #include "storage/mysql_storage.h"
+#else
+#include "storage/mem_only_storage.h"
+#endif
 #include "storage/metadata_initializer.h"
 
 using std::pair;
@@ -76,8 +80,12 @@ class TestSlog {
  private:
   ConfigurationPtr config_;
   SharderPtr sharder_;
-  // shared_ptr<MemOnlyStorage> storage_;
+  #ifdef MYSQL_DEBUG
   shared_ptr<MySQLStorage> storage_;
+  #else
+  shared_ptr<MemOnlyStorage> storage_;
+  #endif
+
   shared_ptr<MetadataInitializer> metadata_initializer_;
   shared_ptr<Broker> broker_;
   ModuleRunnerPtr server_;
