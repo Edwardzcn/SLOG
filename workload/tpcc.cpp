@@ -116,6 +116,7 @@ std::pair<Transaction*, TransactionProfile> TPCCWorkload::NextTransaction() {
 
   Transaction* txn = new Transaction();
   std::discrete_distribution<> select_tpcc_txn(txn_mix_.begin(), txn_mix_.end());
+  // 5 txn types. Default is: "45:43:4:4:4"
   switch (select_tpcc_txn(rg_)) {
     case 0:
       NewOrder(*txn, pro, w, partition);
@@ -152,7 +153,8 @@ void TPCCWorkload::NewOrder(Transaction& txn, TransactionProfile& pro, int w_id,
   int i_w_id = partition + static_cast<int>(local_region_ * config_->num_partitions()) + 1;
   auto datetime = std::chrono::system_clock::now().time_since_epoch().count();
   std::array<tpcc::NewOrderTxn::OrderLine, tpcc::kLinePerOrder> ol;
-  std::bernoulli_distribution is_remote(0.01);
+  // Change the bernolli_distribution to make all transaction remote
+  // std::bernoulli_distribution is_remote(0.01);
   std::uniform_int_distribution<> quantity_rnd(1, 10);
   for (size_t i = 0; i < tpcc::kLinePerOrder; i++) {
     auto supply_w_id = w_id;
@@ -302,11 +304,14 @@ std::vector<int> TPCCWorkload::SelectRemoteWarehouses(int partition) {
   auto num_replicas = config_->num_replicas();
   auto max_num_homes = std::min(params_.GetUInt32(HOMES), num_replicas);
   if (max_num_homes < 2) {
+    // n<2 return empty
     return {};
   }
+  // Generate number of homes involved 2<=n<=max_num_homes
   auto num_homes = std::uniform_int_distribution{2U, max_num_homes}(rg_);
+  // Sample the slot position
   auto remote_warehouses = zipf_sample(rg_, zipf_coef_, distance_ranking_, num_homes - 1);
-
+  // For each position, sample a warehouse.
   for (size_t i = 0; i < remote_warehouses.size(); i++) {
     auto r = remote_warehouses[i];
     remote_warehouses[i] = SampleOnce(rg_, warehouse_index_[partition][r]);
