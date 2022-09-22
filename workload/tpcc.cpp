@@ -154,7 +154,7 @@ void TPCCWorkload::NewOrder(Transaction& txn, TransactionProfile& pro, int w_id,
   auto datetime = std::chrono::system_clock::now().time_since_epoch().count();
   std::array<tpcc::NewOrderTxn::OrderLine, tpcc::kLinePerOrder> ol;
   // Change the bernolli_distribution to make all transaction remote
-  // std::bernoulli_distribution is_remote(0.01);
+  std::bernoulli_distribution is_remote(1);
   std::uniform_int_distribution<> quantity_rnd(1, 10);
   for (size_t i = 0; i < tpcc::kLinePerOrder; i++) {
     auto supply_w_id = w_id;
