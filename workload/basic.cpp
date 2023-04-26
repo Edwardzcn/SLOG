@@ -241,13 +241,26 @@ std::pair<Transaction*, TransactionProfile> BasicWorkload::NextTransaction() {
       if (params_.GetInt32(NEAREST)) {
         selected_homes.push_back(local_region_);
       } else if(is_overlap_mode) {
+        auto max_num_homes = std::min(params_.GetUInt32(MH_HOMES), num_replicas);
+        CHECK_GE(max_num_homes, 2) << "At least 2 regions must be selected for MH txns";
+        auto num_homes = 0;
+        std::uniform_int_distribution<uint32_t> change_multi(1, 100);
+        if (change_multi(rg_) > 100 - overlap_ratio) {
+          num_homes = std::uniform_int_distribution{2U, max_num_homes}(rg_);
+          selected_homes.reserve(num_homes);
+        } else {
+          num_homes = 1U;
+        }
         std::uniform_int_distribution<uint32_t> dis(1, 100);
         local_access = dis(rg_) > overlap_ratio;
         if (local_access) {
           selected_homes.push_back(local_region_);
-        } else {
-          std::uniform_int_distribution<uint32_t> common_dis(0, num_replicas - 1);
-          selected_homes.push_back(common_dis(rg_));
+          num_homes--;
+        } 
+        if(num_homes){
+          auto sampled_homes = zipf_sample(rg_, zipf_coef_, distance_ranking_, num_homes);
+          selected_homes.insert(selected_homes.end(), sampled_homes.begin(), sampled_homes.end());
+          pro.is_multi_home = true;
         }
       } else if(is_remote_ratio_mode) {
         std::uniform_int_distribution<uint32_t> dis(0, 1000);
@@ -282,13 +295,13 @@ std::pair<Transaction*, TransactionProfile> BasicWorkload::NextTransaction() {
     }
   }
 
-  auto first_home = selected_homes[0];
-  for(size_t i = 1; i < selected_homes.size(); i++) {
-    if(selected_homes[i] != first_home) {
-      pro.is_multi_home = true;
-      break;
-    }
-  }
+  // auto first_home = selected_homes[0];
+  // for(size_t i = 1; i < selected_homes.size(); i++) {
+  //   if(selected_homes[i] != first_home) {
+  //     pro.is_multi_home = true;
+  //     break;
+  //   }
+  // }
 
   CHECK_LE(writes, records) << "Number of writes cannot exceed number of records in a transaction!";
   CHECK_LE(hot_records, records) << "Number of hot records cannot exceed number of records in a transaction!";
